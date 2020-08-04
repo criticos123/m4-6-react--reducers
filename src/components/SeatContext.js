@@ -4,8 +4,8 @@ export const SeatContext = React.createContext();
 const initialState = {
   hasLoaded: false,
   seats: null,
-  numOfRows: 0,
-  seatsPerRow: 0,
+  numOfRows: 8,
+  seatsPerRow: 12,
 };
 
 function reducer(state, action) {
