@@ -1,7 +1,8 @@
 import React from "react";
 import styled from "styled-components";
 import CircularProgress from "@material-ui/core/CircularProgress";
-
+import Tippy from "@tippyjs/react";
+import "tippy.js/dist/tippy.css";
 import { getRowName, getSeatNum } from "../helpers";
 import { range } from "../utils";
 import { SeatContext } from "./SeatContext";
@@ -11,31 +12,44 @@ const TicketWidget = () => {
   const { state } = React.useContext(SeatContext);
   const numOfRows = state.numOfRows;
   const seatsPerRow = state.seatsPerRow;
+  const hasLoaded = state.hasLoaded;
+  const seats = state.seats;
   // TODO: implement the loading spinner <CircularProgress />
   // with the hasLoaded flag
+  if (hasLoaded === true) {
+    return (
+      <Tippy content={<h1>HELLO</h1>}>
+        <Wrapper>
+          {range(numOfRows).map((rowIndex) => {
+            const rowName = getRowName(rowIndex);
 
-  return (
-    <Wrapper>
-      {range(numOfRows).map((rowIndex) => {
-        const rowName = getRowName(rowIndex);
-
-        return (
-          <Row key={rowIndex}>
-            <RowLabel>Row {rowName}</RowLabel>
-            {range(seatsPerRow).map((seatIndex) => {
-              const seatId = `${rowName}-${getSeatNum(seatIndex)}`;
-
-              return (
-                <SeatWrapper key={seatId}>
-                  <ImageTag />
-                </SeatWrapper>
-              );
-            })}
-          </Row>
-        );
-      })}
-    </Wrapper>
-  );
+            return (
+              <Row key={rowIndex}>
+                <RowLabel>Row {rowName}</RowLabel>
+                {range(seatsPerRow).map((seatIndex) => {
+                  const seatId = `${rowName}-${getSeatNum(seatIndex)}`;
+                  if (seats[seatId].isBooked === false) {
+                    return <ImageTag style={{ filter: "grayscale(100%)" }} />;
+                  }
+                  return (
+                    <SeatWrapper key={seatId}>
+                      <ImageTag />
+                    </SeatWrapper>
+                  );
+                })}
+              </Row>
+            );
+          })}
+        </Wrapper>
+      </Tippy>
+    );
+  } else {
+    return (
+      <Wrapper>
+        <CircularProgress />
+      </Wrapper>
+    );
+  }
 };
 
 const Wrapper = styled.div`
@@ -48,10 +62,9 @@ const Wrapper = styled.div`
 const Row = styled.div`
   display: flex;
   position: relative;
-
-  &:not(:last-of-type) {
-    border-bottom: 1px solid #ddd;
-  }
+  color: black;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 const RowLabel = styled.div`
